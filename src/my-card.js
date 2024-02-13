@@ -1,4 +1,11 @@
 import { LitElement, html, css } from 'lit';
+import "@lrnwebcomponents/meme-maker/meme-maker.js";
+
+/**
+ * Now it's your turn. Here's what we need to try and do:
+ * 1. Get you HTML from your card working in here 
+ * 2. Get your CSS rescoped as needed to work here
+ */
 
 export class MyCard extends LitElement {
 
@@ -8,136 +15,184 @@ export class MyCard extends LitElement {
 
   constructor() {
     super();
-    this.title = "Title goes here";
-    this.image = "Image goes here";
-    this.bodyText = "Body Text goes here";
-    this.link = "Link goes here";
-    this.borderColor = "Border color goes here";
-    this.buttonColor = "Button color goes here";
+    this.title = "My card";
+    this.backgroundColor = "#f0f0f0";
+    this.fancy = false;
+    this.description='';
   }
 
   static get styles() {
     return css`
       :host {
-        display: inline-flex;
-      }
-
-      body {
-        font-family: 'Arial', sans-serif;
+        display: block;
         margin: 0;
         padding: 0;
-        align-items: center;
-        justify-content: center;
-        height: 500px;
-      }
-
-      #cardlist {
         display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: var(--background-color, #f0f0f0);
       }
 
       .card {
         max-width: 400px;
-        border: 2px solid var(--border-color, #E6AD00);;
-        border-radius: 8px;
+        border: 2px solid #ddd;
         margin: 16px;
         padding: 12px;
-        box-sizing: border-box;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
       }
 
-      .card-img {
+      img {
         width: 100%;
         height: auto;
-        border-radius: 4px;
       }
 
       .card-content {
-        margin-top: 10px;
+        margin-top: 12px;
+        text-align: center;
       }
 
-      .card-title {
-        margin: 0;
+      h2 {
+        margin-bottom: 8px;
       }
 
-      .card-description {
-        margin: 10px 0;
-        font-size: 16px;
-      }
-
-      .card button {
+      .details-btn {
         display: none;
-        margin: 2px 0;
-      }
-
-      #control-wrapper button {
-        margin: 6px 0 0 6px;
-      }
-
-      .card button {
-        margin: 2px 0;
-        padding: 10px 15px;
-        background-color: var(--button-color, #284C6E);
+        background-color: #3498db;
         color: #fff;
-        font-size: 16px;
+        padding: 8px 16px;
         text-decoration: none;
-        border: none;
         border-radius: 4px;
       }
 
-      .card button:hover, #control-wrapper button:hover{
-        background-color: #0D141F;
-        transition: background-color 0.3s ease;
+      .color-btn {
+        background-color: #2ecc71;
+        color: #fff;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 12px;
       }
 
-      .change-color {
-        background-color: #70707047;
+      .delete-btn {
+        background-color: #e74c3c;
+        color: #fff;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 12px;
       }
 
-      @media only screen and (max-width: 800px) and (min-width: 501px) {
-        .card button {
-          display: inline-block;
-        }
-      }
+      details summary {
+    font-size: 20px;
+    padding: 8px 0;
+  }
 
-      @media only screen and (max-width: 500px) {
-        .card {
-          max-width: 300px;
-        }
-
-        .card-title {
-          font-size: 18px;
-        }
-
-        .details-btn {
-          display: inline-block;
-        }
-      }
+  details[open] summary {
+    font-weight: bold;
+  }
+  
+  details div {
+    border: 2px solid black;
+    text-align: left;
+    padding: 8px;
+    height: 70px;
+    overflow: auto;
+  }
     `;
+  }
+
+  openChanged(e) {
+    if (e.newState === "open") {
+      this.fancy = true;
+    } else {
+      this.fancy = false;
+    }
   }
 
   render() {
     return html`
-    <div id="cardlist" class="card-list">
-      <section class="card" style="--border-color: ${this.borderColor};">
-        <img src="${this.image}" alt="${this.title}" class="card-img">
-        <div class="card-content">
-          <h2 class="card-title">${this.title}</h2>
-          <p class="card-description">${this.bodyText}</p>
-          <a href="${this.link}"><button style="--button-color: ${this.buttonColor};">Details</button></a>
-        </div>
+      <section class="card" id="colorCard">
+      <meme-maker alt="Cat stalking a small toy" image-url="https://cdn2.thecatapi.com/images/9j5.jpg" top-text="I bring you" bottom-text="the death">
+      </meme-maker>        
+      <div class="card-content">
+          <h2>${this.title}</h2>
+        <details ?open="${this.fancy}" @toggle="${this.openChanged}">
+          <summary>Quotes</summary>
+        <div>
+            <slot>${this.description}</slot>
+          </div>
+        </details>
+        <button class="color-btn" onclick="location.href='https://hax.psu.edu'" type="button">Details</button>
+          <button class="color-btn" @click="${this.changeColor}">Change Color</button>
+      <button class="delete-btn" @click="${this.deleteCard}">Delete Card</button>
+      <button class="color-btn" @click="${this.duplicateCard}">Duplicate Card</button>
+        <button class="color-btn" @click="${this.generateRandomQuote}">Generate Random Quote</button>
       </section>
-    </div>`;
+    `;
   }
 
   static get properties() {
     return {
       title: { type: String },
-      image: { type: String },
-      bodyText: { type: String },
-      link: { type: String },
-      borderColor: { type: String },
-      buttonColor: { type: String },
+      backgroundColor: { type: String },
+      fancy: { type: Boolean, reflect: true },
+      description: { type: String },
     };
   }
+
+  Details(){
+
+  }
+
+  changeColor() {
+    const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+    const cardElement = this.shadowRoot.querySelector('.card');
+    cardElement.style.backgroundColor = randomColor;
+  }
+
+  duplicateCard() {
+    const newCard = document.createElement('my-card');
+    newCard.title = this.title;
+    newCard.backgroundColor = this.backgroundColor;
+    this.parentNode.appendChild(newCard);
+  }
+
+  deleteCard() {
+    const allCards = this.parentNode.querySelectorAll('my-card');
+
+    if (allCards.length > 1) {
+      this.remove();
+    } else {
+      alert("Cannot delete the last card. At least one card must remain.");
+    }
+  }
+
+  generateRandomQuote() {
+    const quotes = [
+      "The sun has set, but the memories linger.",
+      "Chase the sunset and discover a world of possibilities.",
+      "As the sun sets, let your worries fade away.",
+    ];
+  
+    const randomIndex = Math.floor(Math.random() * quotes.length);
+    this.description = quotes[randomIndex];
+  
+    // Update the slot content with the new quote
+    const slotElement = this.shadowRoot.querySelector('.card-content slot');
+    slotElement.textContent = this.description;
+  }
+  
+  
 }
+
+
+
 
 globalThis.customElements.define(MyCard.tag, MyCard);
