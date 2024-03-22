@@ -222,4 +222,4 @@ export class CampusAlert extends LitElement {
   }
 }
 
-customElements.define(CampusAlert.tag, CampusAlert);
+globalThis.customElements.define(CampusAlert.tag, CampusAlert);
