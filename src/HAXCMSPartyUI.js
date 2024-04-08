@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { DDD } from "@lrnwebcomponents/d-d-d/d-d-d.js";
 import "@lrnwebcomponents/rpg-character/rpg-character.js";
+//import "@lrnwebcomponents/multiple-choice/lib/confetti-container.js";
 
 class HAXCMSPartyUI extends DDD {
 static get tag() {
@@ -78,28 +79,68 @@ static get tag() {
     userInput: { type: String }
   };
 
-  constructor() {
+ constructor() {
     super();
     this.partyMembers = [];
     this.userInput = '';
   }
 
+  connectedCallback() {
+    super.connectedCallback();
+    // Listen for "Enter" key press event
+    this.addEventListener('keypress', this.handleKeyPress);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    // Remove event listener when element is disconnected
+    this.removeEventListener('keypress', this.handleKeyPress);
+  }
+
+ // Event handler for "Enter" key press event
+  handleKeyPress(event) {
+    if (event.key === 'Enter') {
+      this.addUser();
+    }
+  }
+
+  // Method to add user
   addUser() {
-    const sanitizedInput = this.userInput.toLowerCase().replace(/[^a-z0-9]/g, '');
+    // Limit username to maximum of 10 characters
+    const sanitizedInput = this.userInput.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 10);
     if (sanitizedInput) {
       this.partyMembers = [...this.partyMembers, sanitizedInput];
       this.userInput = '';
     }
   }
 
+   // Method to remove user
   removeUser(username) {
     this.partyMembers = this.partyMembers.filter(member => member !== username);
   }
 
+// Method to save party
   saveParty() {
     this.dispatchEvent(new CustomEvent('save-party', { detail: this.partyMembers }));
+    // Trigger confetti effect
+    this.makeItRain(); 
   }
 
+  //For some reason when I uncomment the below makeItRain() method everything from this file disappears from the Website. This wasn't the first time it happened
+  //it also happened when we were making the counter app.
+
+  // Method to trigger confetti effect
+  // makeItRain() {
+  //   import("@lrnwebcomponents/multiple-choice/lib/confetti-container.js").then(
+  //     (module) => {
+  //       setTimeout(() => {
+  //         this.shadowRoot.querySelector("#confetti").setAttribute("popped", "");
+  //       }, 0);
+  //     }
+  //   );
+  // }
+
+  // Render method to define component template
   render() {
     return html`
       <div class="container">
@@ -121,5 +162,6 @@ static get tag() {
     `;
   }
 }
+
 
 globalThis.customElements.define(HAXCMSPartyUI.tag, HAXCMSPartyUI);
